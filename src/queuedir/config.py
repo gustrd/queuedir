@@ -12,6 +12,7 @@ class Config:
     failed_dir: Optional[Path] = None
     timeout: int = 1200
     poll_interval: float = 2.0
+    venv_path: Optional[Path] = None
     once: bool = False
     verbose: bool = False
 
@@ -26,6 +27,8 @@ class Config:
             self.failed_dir = self.watch_dir / "failed"
         else:
             self.failed_dir = Path(self.failed_dir).resolve()
+        if self.venv_path is not None:
+            self.venv_path = Path(self.venv_path).resolve()
 
 
 def load_config(
@@ -35,16 +38,19 @@ def load_config(
     failed_dir: Optional[str] = None,
     timeout: Optional[int] = None,
     poll_interval: Optional[float] = None,
+    venv_path: Optional[str] = None,
     once: bool = False,
     verbose: bool = False,
 ) -> Config:
     env_timeout = os.environ.get("QUEUEDIR_TIMEOUT")
     env_poll = os.environ.get("QUEUEDIR_POLL_INTERVAL")
     env_verbose = os.environ.get("QUEUEDIR_VERBOSE")
+    env_venv = os.environ.get("QUEUEDIR_VENV")
 
     final_timeout = timeout if timeout is not None else (int(env_timeout) if env_timeout else 1200)
     final_poll = poll_interval if poll_interval is not None else (float(env_poll) if env_poll else 2.0)
     final_verbose = verbose or (env_verbose and env_verbose.lower() in ("1", "true", "yes"))
+    final_venv = venv_path if venv_path is not None else env_venv
 
     return Config(
         watch_dir=watch_dir,
@@ -53,6 +59,7 @@ def load_config(
         failed_dir=failed_dir,
         timeout=final_timeout,
         poll_interval=final_poll,
+        venv_path=final_venv,
         once=once,
         verbose=final_verbose,
     )

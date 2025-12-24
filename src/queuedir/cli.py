@@ -39,6 +39,7 @@ def parse_args(args=None) -> argparse.Namespace:
     parser.add_argument("--failed-dir", help="Destination for failed files")
     parser.add_argument("--timeout", type=int, help="Script timeout in seconds")
     parser.add_argument("--poll-interval", type=float, help="Stability check interval")
+    parser.add_argument("--venv", help="Path to virtual environment to activate")
     parser.add_argument("--once", action="store_true", help="Process existing and exit")
     parser.add_argument("-v", "--verbose", action="store_true", help="Debug logging")
     return parser.parse_args(args)
@@ -56,7 +57,7 @@ def process_file(filepath: Path, config: Config) -> bool:
         move_to_folder(filepath, config.failed_dir)
         return False
 
-    result = run_script(config.script_path, filepath, config.timeout)
+    result = run_script(config.script_path, filepath, config.timeout, config.venv_path)
     logger.debug(f"stdout: {result.stdout}")
     logger.debug(f"stderr: {result.stderr}")
 
@@ -121,6 +122,7 @@ def main(args=None):
         failed_dir=parsed.failed_dir,
         timeout=parsed.timeout,
         poll_interval=parsed.poll_interval,
+        venv_path=parsed.venv,
         once=parsed.once,
         verbose=parsed.verbose,
     )
