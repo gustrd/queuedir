@@ -2,7 +2,7 @@ import fnmatch
 import logging
 import queue
 from pathlib import Path
-from typing import Set
+from typing import Optional, Set
 
 from watchdog.events import FileSystemEventHandler, FileCreatedEvent, FileMovedEvent
 from watchdog.observers import Observer
@@ -89,7 +89,7 @@ class FolderWatcher:
         self.observer.join()
         logger.info("Watcher stopped")
 
-    def get_file(self, timeout: float = 1.0) -> Path | None:
+    def get_file(self, timeout: float = 1.0) -> Optional[Path]:
         try:
             return self.file_queue.get(timeout=timeout)
         except queue.Empty:
