@@ -9,7 +9,6 @@ on:
 jobs:
   test:
     name: Run tests on ${{ matrix.os }} / Py ${{ matrix.python-version }}
-    # The strategy matrix runs combinations of the lists below
     strategy:
       fail-fast: false
       matrix:
@@ -28,12 +27,16 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
+      shell: bash
       run: |
         python -m pip install --upgrade pip
-        pip install pytest
+        pip install pytest pytest-timeout  # Added pytest-timeout based on your log warning
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      shell: bash # Ensures consistent script behavior on Windows and Linux
+        # IMPORTANT: Install the current project in editable mode
+        pip install -e . 
 
     - name: Run tests with pytest
+      # Using 'python -m pytest' is safer than just 'pytest' 
+      # as it automatically adds the current directory to sys.path
       run: |
-        pytest
+        python -m pytest
